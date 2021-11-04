@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Kick__Push
 {
@@ -18,8 +20,10 @@ namespace Kick__Push
             MainGame
         }
 
+        //misc
         Screen currentScreen;
         KeyboardState keyboardState;
+        Random genertaor;
 
         //Animation variables
         int frame;
@@ -59,6 +63,8 @@ namespace Kick__Push
             frame = 0;
             animationStartTime = 0;
 
+            //initialize random generator
+            genertaor = new Random();
 
 
             base.Initialize();
@@ -66,11 +72,17 @@ namespace Kick__Push
             skaterTexture = skaterAnimationList[frame];
 
             //initialize background objects
-            speedLevel1 = new Vector2(0, 2);
-            speedLevel1 = new Vector2(0, 1);
-            speedLevel1 = new Vector2(0, (float)0.5);
+            speedLevel1 = new Vector2(-1.5f, 0);
+            speedLevel2 = new Vector2(-1, 0);
+            speedLevel3 = new Vector2(-0.5f, 0);
 
-            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(200, 600, 41, 41), speedLevel1));
+            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(600, 230, 60, 60), speedLevel1));
+            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(800, 200, 40, 40), speedLevel2));
+            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(900, 180, 30, 30), speedLevel3));
+            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(200, 180, 30, 30), speedLevel2));
+            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(440, 180, 30, 30), speedLevel3));
+
+            backgroundObjects = backgroundObjects.OrderByDescending(o => o.Speed.X).ToList();
         }
 
         protected override void LoadContent()
@@ -95,6 +107,8 @@ namespace Kick__Push
                 Exit();
 
             // TODO: Add your update logic here
+            if (keyboardState.IsKeyDown(Keys.Space))
+                currentScreen = Screen.MainGame;
 
             // Determine current screen and appply appropriate update logic
             if (currentScreen == Screen.Title)
@@ -110,8 +124,7 @@ namespace Kick__Push
         {
             // update loop for title screen
 
-            if (keyboardState.IsKeyDown(Keys.Enter))
-                currentScreen = Screen.MainGame;
+            
         }
 
         protected void MainGame(GameTime gameTime)
@@ -135,10 +148,32 @@ namespace Kick__Push
             }
 
             //move background
-            foreach (BackgroundObject backgroundObject in backgroundObjects)
+            
+            for (int i = 0; i < backgroundObjects.Count; i++)
             {
-                //backgroundObject.Move();
+
+                backgroundObjects[i].Move();
+
+                if (backgroundObjects[i].Bounds.X <= (0 - backgroundObjects[i].Bounds.Width))
+                {
+                    backgroundObjects[i].Bounds = new Rectangle(genertaor.Next(_graphics.PreferredBackBufferWidth - 100, _graphics.PreferredBackBufferWidth), backgroundObjects[i].Bounds.Y, backgroundObjects[i].Bounds.Width, backgroundObjects[i].Bounds.Height);
+                    //backgroundObjects[i].Update(genertaor.Next(1100, 1200));
+                    //backgroundObject.Location = new Point(genertaor.Next(1200, 1300), 200);
+                }
+                
             }
+            
+            
+            //foreach (BackgroundObject backgroundObject in backgroundObjects)
+            //{
+            //    backgroundObject.Move();
+
+            //    if (backgroundObject.Bounds.X <= (0 - backgroundObject.Bounds.Width/2))
+            //    {
+            //        backgroundObject.Bounds = new Rectangle(genertaor.Next(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferWidth + 100), backgroundObject.Bounds.Y, backgroundObject.Bounds.Width, backgroundObject.Bounds.Height);
+            //        //backgroundObject.Location = new Point(genertaor.Next(1200, 1300), 200);
+            //    }
+            //}
 
         }
 
@@ -174,16 +209,19 @@ namespace Kick__Push
             // draw loop for main game screen
 
             _spriteBatch.Begin();
+
             //street
             _spriteBatch.Draw(street, new Rectangle(0, 200, 1200, 400), Color.White);
+
+            //background 
+            foreach (BackgroundObject backgroundObject in backgroundObjects)
+            {
+                backgroundObject.Draw(_spriteBatch);
+            }
+
             //skater
             _spriteBatch.Draw(skaterTexture, new Rectangle(_graphics.PreferredBackBufferWidth / 3, 300, 141, 180), Color.White);
-            //background 
-            backgroundObjects[0].Draw(_spriteBatch);
-            //foreach (BackgroundObject backgroundObject in backgroundObjects)
-            //{
-            //    backgroundObject.Draw(_spriteBatch);
-            //}
+
             _spriteBatch.End();
 
 

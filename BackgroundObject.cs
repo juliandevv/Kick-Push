@@ -8,15 +8,17 @@ namespace Kick__Push
 {
     class BackgroundObject
     {
-          private Texture2D _texture;
-          private Rectangle _rectangle;
-          private Vector2 _speed;
+        private Texture2D _texture;
+        private Rectangle _rectangle;
+        private Vector2 _speed;
+        private Vector2 _location;
 
         public BackgroundObject(Texture2D texture, Rectangle rect, Vector2 speed)
         {
             _texture = texture;
             _rectangle = rect;
             _speed = speed;
+            _location = new Vector2(rect.X, rect.Y);
         }
 
         public Texture2D Texture
@@ -36,9 +38,28 @@ namespace Kick__Push
             set { _speed = value; }
         }
 
+        //public Point Location
+        //{
+        //    get { return _location; }
+        //    set { _location = value; }
+        //}
+
+        //public BackgroundObject CompareTo(BackgroundObject compareSpeed)
+        //{
+        //    return this.Speed.X.CompareTo(compareSpeed.Speed.X);
+        //}
+
+        public void Update(int x)
+        {
+            _rectangle.X = x;
+        }
+
         public void Move()
         {
-            _rectangle.Offset(_speed);
+     
+            _location.X += _speed.X;
+            _rectangle.Location = new Point(_location.ToPoint().X, _location.ToPoint().Y);
+
         }
 
         public void Draw(SpriteBatch _spriteBatch)
