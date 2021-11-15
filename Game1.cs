@@ -32,7 +32,7 @@ namespace Kick__Push
         Texture2D skaterTexture;
 
         //background objects
-        Texture2D bush1;
+        Texture2D bush1, tree1;
         List<BackgroundObject> backgroundObjects = new List<BackgroundObject>();
         Vector2 speedLevel1, speedLevel2, speedLevel3;
 
@@ -72,15 +72,16 @@ namespace Kick__Push
             skaterTexture = skaterAnimationList[frame];
 
             //initialize background objects
-            speedLevel1 = new Vector2(-1.5f, 0);
+            speedLevel1 = new Vector2(-2f, 0);
             speedLevel2 = new Vector2(-1, 0);
             speedLevel3 = new Vector2(-0.5f, 0);
 
             backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(600, 230, 60, 60), speedLevel1));
             backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(800, 200, 40, 40), speedLevel2));
             backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(900, 180, 30, 30), speedLevel3));
-            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(200, 180, 30, 30), speedLevel2));
-            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(440, 180, 30, 30), speedLevel3));
+            backgroundObjects.Add(new BackgroundObject(bush1, new Rectangle(200, 180, 30, 30), speedLevel3));
+            backgroundObjects.Add(new BackgroundObject(tree1, new Rectangle(440, 100, 120, 160), speedLevel2));
+            backgroundObjects.Add(new BackgroundObject(tree1, new Rectangle(740, 100, 90, 120), speedLevel3));
 
             backgroundObjects = backgroundObjects.OrderByDescending(o => o.Speed.X).ToList();
         }
@@ -98,6 +99,7 @@ namespace Kick__Push
             //Background Object Textures
             street = Content.Load<Texture2D>("ROAD 2 (bigger)");
             bush1 = Content.Load<Texture2D>("bush1");
+            tree1 = Content.Load<Texture2D>("tree");
 
         }
 
@@ -134,7 +136,7 @@ namespace Kick__Push
             //animate skater
             float elapsedAnimationTime = (float)gameTime.TotalGameTime.TotalMilliseconds - animationStartTime;
 
-            if (elapsedAnimationTime > 550)
+            if (elapsedAnimationTime > 450)
             {
                 if (frame == 1)
                     frame = 0;
@@ -156,7 +158,8 @@ namespace Kick__Push
 
                 if (backgroundObjects[i].Bounds.X <= (0 - backgroundObjects[i].Bounds.Width))
                 {
-                    backgroundObjects[i].Bounds = new Rectangle(genertaor.Next(_graphics.PreferredBackBufferWidth - 100, _graphics.PreferredBackBufferWidth), backgroundObjects[i].Bounds.Y, backgroundObjects[i].Bounds.Width, backgroundObjects[i].Bounds.Height);
+                    //backgroundObjects[i].Reset(_graphics);
+                    backgroundObjects[i].Bounds = new Rectangle(genertaor.Next(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferWidth + 100), backgroundObjects[i].Bounds.Y, backgroundObjects[i].Bounds.Width, backgroundObjects[i].Bounds.Height);
                     //backgroundObjects[i].Update(genertaor.Next(1100, 1200));
                     //backgroundObject.Location = new Point(genertaor.Next(1200, 1300), 200);
                 }
@@ -220,7 +223,7 @@ namespace Kick__Push
             }
 
             //skater
-            _spriteBatch.Draw(skaterTexture, new Rectangle(_graphics.PreferredBackBufferWidth / 3, 300, 141, 180), Color.White);
+            _spriteBatch.Draw(skaterTexture, new Rectangle(_graphics.PreferredBackBufferWidth / 3, 280, 141, 180), Color.White);
 
             _spriteBatch.End();
 

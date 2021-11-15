@@ -12,6 +12,7 @@ namespace Kick__Push
         private Rectangle _rectangle;
         private Vector2 _speed;
         private Vector2 _location;
+       
 
         public BackgroundObject(Texture2D texture, Rectangle rect, Vector2 speed)
         {
@@ -29,9 +30,10 @@ namespace Kick__Push
         public Rectangle Bounds
         {
             get { return _rectangle; }
-            set { _rectangle = value; }
+            set { _rectangle = value;
+                _location = new Vector2(value.X, value.Y); }
         }
-
+        
         public Vector2 Speed
         {
             get { return _speed; }
@@ -49,10 +51,11 @@ namespace Kick__Push
         //    return this.Speed.X.CompareTo(compareSpeed.Speed.X);
         //}
 
-        public void Update(int x)
-        {
-            _rectangle.X = x;
-        }
+        //public void Reset(GraphicsDeviceManager _graphics)
+        //{
+        //    _location.X = genertaor.Next(_graphics.PreferredBackBufferWidth - 100, _graphics.PreferredBackBufferWidth);
+        //    _rectangle = new Rectangle((int)_location.X, (int)_location.Y, _rectangle.Width, _rectangle.Height);
+        //}
 
         public void Move()
         {
