@@ -25,16 +25,22 @@ namespace Kick__Push
         KeyboardState keyboardState;
         Random genertaor;
 
-        //Animation variables
+        //Skater
         int frame;
         float animationStartTime;
         List<Texture2D> skaterAnimationList = new List<Texture2D>();
-        Texture2D skaterTexture;
+        Texture2D skaterTexture, up, down;
+        Rectangle skaterBounds;
 
         //background objects
         Texture2D bush1, tree1;
         List<BackgroundObject> backgroundObjects = new List<BackgroundObject>();
         Vector2 speedLevel1, speedLevel2, speedLevel3;
+
+        //obstacles
+        Texture2D obstacleKicker;
+        List<Obstacle> obstacles = new List<Obstacle>();
+
 
         //Textures
         Texture2D street;
@@ -66,6 +72,9 @@ namespace Kick__Push
             //initialize random generator
             genertaor = new Random();
 
+            //initialize skater rectangle
+            skaterBounds = new Rectangle(_graphics.PreferredBackBufferWidth / 3, 280, 141, 180);
+
 
             base.Initialize();
             //set initial frame of skater
@@ -84,6 +93,8 @@ namespace Kick__Push
             backgroundObjects.Add(new BackgroundObject(tree1, new Rectangle(740, 100, 90, 120), speedLevel3));
 
             backgroundObjects = backgroundObjects.OrderByDescending(o => o.Speed.X).ToList();
+
+            obstacles.Add(new Obstacle(obstacleKicker, new Rectangle(800, 400, 180, 100), speedLevel1));
         }
 
         protected override void LoadContent()
@@ -95,11 +106,17 @@ namespace Kick__Push
             //Skater Animation Textures
             skaterAnimationList.Add(Content.Load<Texture2D>("skaterTexture1"));
             skaterAnimationList.Add(Content.Load<Texture2D>("skaterTexture2"));
+            up = Content.Load<Texture2D>("Up");
+            down = Content.Load<Texture2D>("Down");
+
 
             //Background Object Textures
             street = Content.Load<Texture2D>("ROAD 2 (bigger)");
             bush1 = Content.Load<Texture2D>("bush1");
             tree1 = Content.Load<Texture2D>("tree");
+
+            //obstacle Textures
+            obstacleKicker = Content.Load<Texture2D>("Kicker");
 
         }
 
@@ -132,7 +149,25 @@ namespace Kick__Push
         protected void MainGame(GameTime gameTime)
         {
             // update loop for main game screen
-            
+
+            keyboardState = Keyboard.GetState();
+
+            //controls
+            if (keyboardState.IsKeyDown(Keys.Down))
+            {
+                skaterBounds.Y += 1;
+                skaterTexture = down;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Up))
+            {
+                skaterBounds.Y -= 1;
+                skaterTexture = up;
+            }
+
+
+
+
             //animate skater
             float elapsedAnimationTime = (float)gameTime.TotalGameTime.TotalMilliseconds - animationStartTime;
 
@@ -143,10 +178,11 @@ namespace Kick__Push
                 else
                     frame++;
 
-
-                skaterTexture = skaterAnimationList[frame];
-                animationStartTime = (float)gameTime.TotalGameTime.TotalMilliseconds;
-                
+                if (keyboardState.IsKeyUp(Keys.Up) && keyboardState.IsKeyUp(Keys.Down))
+                {
+                    skaterTexture = skaterAnimationList[frame];
+                    animationStartTime = (float)gameTime.TotalGameTime.TotalMilliseconds;
+                }
             }
 
             //move background
@@ -165,8 +201,34 @@ namespace Kick__Push
                 }
                 
             }
-            
-            
+
+            //move obstacles
+
+            for (int i = 0; i < obstacles.Count; i++)
+            {
+
+                obstacles[i].Move();
+
+                if (obstacles[i].Bounds.X <= (0 - obstacles[i].Bounds.Width))
+                {
+                    obstacles[i].Bounds = new Rectangle(genertaor.Next(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferWidth + 100), genertaor.Next(300, 400), obstacles[i].Bounds.Width, obstacles[i].Bounds.Height);
+                }
+
+                else if (obstacles[i].Bounds.Left <= skaterBounds.Right && obstacles[i].Bounds.Left >= skaterBounds.Right - 110 && skaterBounds.Bottom <= obstacles[i].Bounds.Bottom && skaterBounds.Bottom >= obstacles[i].Bounds.Top)
+                {
+                    skaterBounds.Y -= 1;
+                }
+
+                else if (obstacles[i].Bounds.Right <= skaterBounds.Left  + 40 && obstacles[i].Bounds.Right >= skaterBounds.Left - 100 && skaterBounds.Bottom <= obstacles[i].Bounds.Bottom && skaterBounds.Bottom >= obstacles[i].Bounds.Top)
+                {
+                    skaterBounds.Y += 2;
+                }
+            }
+
+            //check collisions
+
+
+
             //foreach (BackgroundObject backgroundObject in backgroundObjects)
             //{
             //    backgroundObject.Move();
@@ -222,8 +284,14 @@ namespace Kick__Push
                 backgroundObject.Draw(_spriteBatch);
             }
 
+            //obstacles
+            foreach (Obstacle obstacle in obstacles)
+            {
+                obstacle.Draw(_spriteBatch);
+            }
+
             //skater
-            _spriteBatch.Draw(skaterTexture, new Rectangle(_graphics.PreferredBackBufferWidth / 3, 280, 141, 180), Color.White);
+            _spriteBatch.Draw(skaterTexture, skaterBounds, Color.White);
 
             _spriteBatch.End();
 

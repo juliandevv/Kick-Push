@@ -26,5 +26,34 @@ namespace Kick__Push
 			get { return _texture; }
 		}
 
+        public Rectangle Bounds
+        {
+            get { return _rectangle; }
+            set
+            {
+                _rectangle = value;
+                _location = new Vector2(value.X, value.Y);
+            }
+        }
+
+        public Vector2 Speed
+        {
+            get { return _speed; }
+            set { _speed = value; }
+        }
+
+        public void Draw(SpriteBatch _spriteBatch)
+        {
+            _spriteBatch.Draw(this.Texture, this.Bounds, Color.White);
+        }
+
+        public void Move()
+        {
+
+            _location.X += _speed.X;
+            _rectangle.Location = new Point(_location.ToPoint().X, _location.ToPoint().Y);
+
+        }
+
     }
 }
