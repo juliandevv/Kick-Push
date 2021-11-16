@@ -24,6 +24,8 @@ namespace Kick__Push
         Screen currentScreen;
         KeyboardState keyboardState;
         Random genertaor;
+        SpriteFont title;
+        Vector2 titleSize;
 
         //Skater
         int frame;
@@ -45,7 +47,7 @@ namespace Kick__Push
         //Textures
         Texture2D street;
 
-        //Lists
+       
 
         public Game1()
         {
@@ -63,7 +65,7 @@ namespace Kick__Push
             _graphics.ApplyChanges();
 
             //initial screen
-            currentScreen = Screen.MainGame;
+            currentScreen = Screen.Title;
 
             //Initialize main animation
             frame = 0;
@@ -75,8 +77,11 @@ namespace Kick__Push
             //initialize skater rectangle
             skaterBounds = new Rectangle(_graphics.PreferredBackBufferWidth / 3, 280, 141, 180);
 
-
             base.Initialize();
+
+            //title text size
+            titleSize = title.MeasureString("Kick, Push");
+
             //set initial frame of skater
             skaterTexture = skaterAnimationList[frame];
 
@@ -102,7 +107,10 @@ namespace Kick__Push
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            
+
+            //title textures
+            title = Content.Load<SpriteFont>("TitleFont");
+
             //Skater Animation Textures
             skaterAnimationList.Add(Content.Load<Texture2D>("skaterTexture1"));
             skaterAnimationList.Add(Content.Load<Texture2D>("skaterTexture2"));
@@ -126,7 +134,7 @@ namespace Kick__Push
                 Exit();
 
             // TODO: Add your update logic here
-            if (keyboardState.IsKeyDown(Keys.Space))
+            if (Keyboard.GetState().IsKeyDown(Keys.Enter))
                 currentScreen = Screen.MainGame;
 
             // Determine current screen and appply appropriate update logic
@@ -142,7 +150,7 @@ namespace Kick__Push
         protected void Title()
         {
             // update loop for title screen
-
+            
             
         }
 
@@ -267,6 +275,10 @@ namespace Kick__Push
         protected void DrawTitle()
         {
             // draw loop for title screen
+
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(title, "Kick, Push", new Vector2(_graphics.PreferredBackBufferWidth/2, _graphics.PreferredBackBufferHeight/5), Color.DarkSlateGray, 0f, new Vector2(titleSize.X/2, titleSize.Y/2), 1f, SpriteEffects.None, 0f);
+            _spriteBatch.End();
         }
 
         protected void DrawMainGame()

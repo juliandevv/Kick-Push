@@ -85,6 +85,13 @@
 /processorParam:TextureFormat=Color
 /build:skaterTexture2.png
 
+#begin TitleFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:TitleFont.spritefont
+
 #begin tree.png
 /importer:TextureImporter
 /processor:TextureProcessor
