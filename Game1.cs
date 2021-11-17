@@ -24,12 +24,18 @@ namespace Kick__Push
         Screen currentScreen;
         KeyboardState keyboardState;
         Random genertaor;
+
+        //title screen
         SpriteFont title;
         Vector2 titleSize;
+        Color titleColor;
+        Texture2D playButton;
+
 
         //Skater
         int frame;
-        float animationStartTime;
+        bool ollieState;
+        float animationStartTime, ollieHeight, ollieStartTime;
         List<Texture2D> skaterAnimationList = new List<Texture2D>();
         Texture2D skaterTexture, up, down;
         Rectangle skaterBounds;
@@ -70,6 +76,8 @@ namespace Kick__Push
             //Initialize main animation
             frame = 0;
             animationStartTime = 0;
+            ollieHeight = 0;
+            ollieStartTime = 0;
 
             //initialize random generator
             genertaor = new Random();
@@ -81,6 +89,7 @@ namespace Kick__Push
 
             //title text size
             titleSize = title.MeasureString("Kick, Push");
+            titleColor = new Color(242, 225, 65);
 
             //set initial frame of skater
             skaterTexture = skaterAnimationList[frame];
@@ -110,6 +119,7 @@ namespace Kick__Push
 
             //title textures
             title = Content.Load<SpriteFont>("TitleFont");
+            playButton = Content.Load<Texture2D>("play button");
 
             //Skater Animation Textures
             skaterAnimationList.Add(Content.Load<Texture2D>("skaterTexture1"));
@@ -172,6 +182,16 @@ namespace Kick__Push
                 skaterBounds.Y -= 1;
                 skaterTexture = up;
             }
+
+            if (keyboardState.IsKeyDown(Keys.S))
+			{
+              
+			}
+
+            if (keyboardState.IsKeyUp(Keys.S))
+			{
+                
+			}
 
 
 
@@ -254,18 +274,19 @@ namespace Kick__Push
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
 
             // determine current screen and draw apropriate textures
             if (currentScreen == Screen.Title)
             {
+                GraphicsDevice.Clear(titleColor);
                 DrawTitle();
             }
 
             else if (currentScreen == Screen.MainGame)
             {
+                GraphicsDevice.Clear(Color.CornflowerBlue);
                 DrawMainGame();
             }
 
@@ -277,7 +298,8 @@ namespace Kick__Push
             // draw loop for title screen
 
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(title, "Kick, Push", new Vector2(_graphics.PreferredBackBufferWidth/2, _graphics.PreferredBackBufferHeight/5), Color.DarkSlateGray, 0f, new Vector2(titleSize.X/2, titleSize.Y/2), 1f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(title, "Kick, Push", new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 5), Color.Black, 0f, new Vector2(titleSize.X / 2, titleSize.Y / 2), 1f, SpriteEffects.None, 0f);
+            _spriteBatch.Draw(playButton, new Rectangle(_graphics.PreferredBackBufferWidth / 2 - 256, _graphics.PreferredBackBufferHeight / 2 - 180, 512, 512), Color.White);
             _spriteBatch.End();
         }
 
