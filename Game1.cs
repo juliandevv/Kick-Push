@@ -119,7 +119,7 @@ namespace Kick__Push
 
             //title textures
             title = Content.Load<SpriteFont>("TitleFont");
-            playButton = Content.Load<Texture2D>("play button");
+            playButton = Content.Load<Texture2D>("play");
 
             //Skater Animation Textures
             skaterAnimationList.Add(Content.Load<Texture2D>("skaterTexture1"));
