@@ -24,21 +24,25 @@ namespace Kick__Push
         Screen currentScreen;
         KeyboardState keyboardState;
         Random genertaor;
+        MouseState mouseState;
 
         //title screen
         SpriteFont title;
         Vector2 titleSize;
-        Color titleColor;
+        Color titleColor, startButtonColor;
         Texture2D playButton;
+        Button startButton;
+
 
 
         //Skater
         int frame;
-        bool ollieState;
-        float animationStartTime, ollieHeight, ollieStartTime;
+        float animationStartTime;
         List<Texture2D> skaterAnimationList = new List<Texture2D>();
-        Texture2D skaterTexture, up, down;
-        Rectangle skaterBounds;
+        Texture2D skaterTexture, up, down, shadow;
+        Rectangle skaterBounds, shadowBounds;
+        float initialSpeed, startTime, yBeforeJump, velocity;
+        bool jumping;
 
         //background objects
         Texture2D bush1, tree1;
@@ -76,20 +80,29 @@ namespace Kick__Push
             //Initialize main animation
             frame = 0;
             animationStartTime = 0;
-            ollieHeight = 0;
-            ollieStartTime = 0;
+           
 
             //initialize random generator
             genertaor = new Random();
 
-            //initialize skater rectangle
-            skaterBounds = new Rectangle(_graphics.PreferredBackBufferWidth / 3, 280, 141, 180);
+            //initialize skater rectangle and shadow
+            skaterBounds = new Rectangle(_graphics.PreferredBackBufferWidth / 3, 0, 141, 180);
+            shadowBounds = new Rectangle(skaterBounds.X + skaterBounds.Width / 2, skaterBounds.Y + skaterBounds.Height, (skaterBounds.Y - 40) / 2, (skaterBounds.Y - 40) / 2);
+
+            //jump
+            startTime = 0;
+            initialSpeed = 35;
+            jumping = false;
 
             base.Initialize();
 
             //title text size
             titleSize = title.MeasureString("Kick, Push");
             titleColor = new Color(242, 225, 65);
+
+            //title button
+            startButton = new Button(playButton, "startButton", new Rectangle(_graphics.PreferredBackBufferWidth / 2 - 150, _graphics.PreferredBackBufferHeight / 2 - 100, 300, 300));
+            startButtonColor = new Color(242, 225, 65);
 
             //set initial frame of skater
             skaterTexture = skaterAnimationList[frame];
@@ -126,6 +139,7 @@ namespace Kick__Push
             skaterAnimationList.Add(Content.Load<Texture2D>("skaterTexture2"));
             up = Content.Load<Texture2D>("Up");
             down = Content.Load<Texture2D>("Down");
+            shadow = Content.Load<Texture2D>("light shadow");
 
 
             //Background Object Textures
@@ -160,7 +174,12 @@ namespace Kick__Push
         protected void Title()
         {
             // update loop for title screen
-            
+            mouseState = Mouse.GetState();
+            if (startButton.EnterButton(mouseState))
+            {
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                    currentScreen = Screen.MainGame;
+            }
             
         }
 
@@ -185,21 +204,55 @@ namespace Kick__Push
 
             if (keyboardState.IsKeyDown(Keys.S))
 			{
-              
-			}
+                if (jumping == false)
+                {
+                    yBeforeJump = skaterBounds.Y;
+                    startTime = (float)gameTime.TotalGameTime.TotalMilliseconds;
+                    velocity = -10;
+                    jumping = true;
+                }
+            }
 
             if (keyboardState.IsKeyUp(Keys.S))
 			{
                 
 			}
 
+            if (jumping == true)
+            {
 
+                float elapsedTime = (float)(gameTime.TotalGameTime.TotalMilliseconds - startTime) / 1000f;
+
+                velocity = (initialSpeed - (40f * elapsedTime));
+                skaterBounds.Y -= (int)(velocity * elapsedTime);
+
+                shadowBounds.Height = (int)((skaterBounds.Y - 40) / 2);
+                shadowBounds.Width = (int)((skaterBounds.Y - 40) / 2);
+
+
+
+                if (velocity >= -velocity)
+                {
+                    skaterTexture = up;
+                }
+
+                if (velocity <= -velocity)
+                {
+                    skaterTexture = down;
+                }
+
+                if (skaterBounds.Y >= yBeforeJump && elapsedTime >= 0.5f)
+                {
+                    skaterBounds.Y = (int)yBeforeJump;
+                    jumping = false;
+                }
+            }
 
 
             //animate skater
             float elapsedAnimationTime = (float)gameTime.TotalGameTime.TotalMilliseconds - animationStartTime;
 
-            if (elapsedAnimationTime > 450)
+            if (elapsedAnimationTime > 450 && jumping == false)
             {
                 if (frame == 1)
                     frame = 0;
@@ -213,8 +266,11 @@ namespace Kick__Push
                 }
             }
 
+            shadowBounds.X = skaterBounds.X;
+            shadowBounds.Y = skaterBounds.Y;
+
             //move background
-            
+
             for (int i = 0; i < backgroundObjects.Count; i++)
             {
 
@@ -254,20 +310,10 @@ namespace Kick__Push
             }
 
             //check collisions
-
-
-
-            //foreach (BackgroundObject backgroundObject in backgroundObjects)
-            //{
-            //    backgroundObject.Move();
-
-            //    if (backgroundObject.Bounds.X <= (0 - backgroundObject.Bounds.Width/2))
-            //    {
-            //        backgroundObject.Bounds = new Rectangle(genertaor.Next(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferWidth + 100), backgroundObject.Bounds.Y, backgroundObject.Bounds.Width, backgroundObject.Bounds.Height);
-            //        //backgroundObject.Location = new Point(genertaor.Next(1200, 1300), 200);
-            //    }
-            //}
-
+            if (skaterBounds.Y <= 180 && gameTime.TotalGameTime.TotalSeconds < 2)
+            {
+                skaterBounds.Y += 10;
+            }
         }
 
 
@@ -280,7 +326,7 @@ namespace Kick__Push
             // determine current screen and draw apropriate textures
             if (currentScreen == Screen.Title)
             {
-                GraphicsDevice.Clear(titleColor);
+                GraphicsDevice.Clear(Color.CornflowerBlue);
                 DrawTitle();
             }
 
@@ -298,8 +344,10 @@ namespace Kick__Push
             // draw loop for title screen
 
             _spriteBatch.Begin();
+            _spriteBatch.Draw(street, new Rectangle(0, 200, 1200, 400), Color.White);
+            startButton.Draw(_spriteBatch, startButtonColor);
             _spriteBatch.DrawString(title, "Kick, Push", new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 5), Color.Black, 0f, new Vector2(titleSize.X / 2, titleSize.Y / 2), 1f, SpriteEffects.None, 0f);
-            _spriteBatch.Draw(playButton, new Rectangle(_graphics.PreferredBackBufferWidth / 2 - 256, _graphics.PreferredBackBufferHeight / 2 - 180, 512, 512), Color.White);
+            //_spriteBatch.Draw(playButton, new Rectangle(_graphics.PreferredBackBufferWidth / 2 - 150, _graphics.PreferredBackBufferHeight / 2 - 100, 300, 300), Color.White);
             _spriteBatch.End();
         }
 
@@ -323,6 +371,9 @@ namespace Kick__Push
             {
                 obstacle.Draw(_spriteBatch);
             }
+
+            //shadow
+           // _spriteBatch.Draw(shadow, shadowBounds, null, Color.White, 0f, new Vector2(-20, -20), SpriteEffects.None, 0f);
 
             //skater
             _spriteBatch.Draw(skaterTexture, skaterBounds, Color.White);
