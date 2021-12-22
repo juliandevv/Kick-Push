@@ -86,7 +86,7 @@ namespace Kick__Push
             genertaor = new Random();
 
             //initialize skater rectangle and shadow
-            skaterBounds = new Rectangle(_graphics.PreferredBackBufferWidth / 3, 0, 141, 180);
+            skaterBounds = new Rectangle(_graphics.PreferredBackBufferWidth / 3, 200, 141, 180);
             shadowBounds = new Rectangle(skaterBounds.X + skaterBounds.Width / 2, skaterBounds.Y + skaterBounds.Height, (skaterBounds.Y - 40) / 2, (skaterBounds.Y - 40) / 2);
 
             //jump
@@ -278,10 +278,7 @@ namespace Kick__Push
 
                 if (backgroundObjects[i].Bounds.X <= (0 - backgroundObjects[i].Bounds.Width))
                 {
-                    //backgroundObjects[i].Reset(_graphics);
                     backgroundObjects[i].Bounds = new Rectangle(genertaor.Next(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferWidth + 100), backgroundObjects[i].Bounds.Y, backgroundObjects[i].Bounds.Width, backgroundObjects[i].Bounds.Height);
-                    //backgroundObjects[i].Update(genertaor.Next(1100, 1200));
-                    //backgroundObject.Location = new Point(genertaor.Next(1200, 1300), 200);
                 }
                 
             }
